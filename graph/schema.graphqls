@@ -1,0 +1,56 @@
+enum Role {
+  user
+  superadmin
+}
+
+type User {
+  id: ID!
+  email: String!
+  firstName: String!
+  lastName: String!
+  role: Role!
+  company: Company
+}
+
+type Company {
+  id: ID!
+  name: String!
+  email: String!
+  country: String!
+}
+
+type Query {
+  users: [User!]!
+  user(email: String!): User
+  companies: [Company!]!
+  company(name: String!): Company
+}
+
+input NewUser {
+  email: String!
+  firstName: String!
+  lastName: String!
+  password: String!
+}
+
+input NewCompany {
+  name: String!
+  email: String!
+  country: String!
+}
+
+input Login {
+  email: String!
+  password: String!
+}
+
+input RefreshTokenInput {
+  token: String!
+}
+
+type Mutation {
+  createUser(input: NewUser!): User
+  createCompany(input: NewCompany!): Company
+  login(input: Login): String!
+  refreshToken(input: RefreshTokenInput): String!
+}

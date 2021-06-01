@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS Companies(
+    ID INT NOT NULL UNIQUE AUTO_INCREMENT,
+    Name VARCHAR (127) ,
+    Email VARCHAR (127) ,
+    Country VARCHAR (127) ,
+    PRIMARY KEY (ID)
+)
