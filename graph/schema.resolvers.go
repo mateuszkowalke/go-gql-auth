@@ -15,7 +15,7 @@ import (
 	"example.com/go-graphql-auth/users"
 )
 
-func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (string, error) {
 	newUser := users.User{&input}
 	newUser.Create()
 	token, err := jwt.GenerateToken(newUser.Email)
@@ -38,11 +38,32 @@ func (r *mutationResolver) CreateCompany(ctx context.Context, input model.NewCom
 }
 
 func (r *mutationResolver) Login(ctx context.Context, input *model.Login) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	var user users.User
+	user.Email = input.Email
+	user.Password = input.Password
+	authenticated := user.Authenticate()
+	if !authenticated {
+		// todo
+		// sort out the struct/interface to pass
+		return "", &users.WrongEmailOrPasswordError{}
+	}
+	token, err := jwt.GenerateToken(user.Email)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }
 
 func (r *mutationResolver) RefreshToken(ctx context.Context, input *model.RefreshTokenInput) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	username, err := jwt.ParseToken(input.Token)
+	if err != nil {
+		return "", fmt.Errorf("access denied")
+	}
+	token, err := jwt.GenerateToken(username)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }
 
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {

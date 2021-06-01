@@ -60,7 +60,7 @@ func GetCompanyByName(name string) (*model.Company, error) {
 	}
 	row := stmt.QueryRow(name)
 	var company model.Company
-	err = row.Scan(&company)
+	err = row.Scan(&company.ID, &company.Name, &company.Email, &company.Country)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			log.Println(err)

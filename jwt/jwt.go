@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -18,7 +19,7 @@ func GenerateToken(email string) (string, error) {
 	/* Create a map to store our claims */
 	claims := token.Claims.(jwt.MapClaims)
 	/* Set token claims */
-	claims["username"] = email
+	claims["email"] = email
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 	tokenString, err := token.SignedString(SecretKey)
 	if err != nil {
@@ -34,6 +35,7 @@ func ParseToken(tokenStr string) (string, error) {
 		return SecretKey, nil
 	})
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		fmt.Println("----------------", claims["email"], "-----------------")
 		email := claims["email"].(string)
 		return email, nil
 	} else {

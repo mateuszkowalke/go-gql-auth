@@ -75,7 +75,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateUser(ctx context.Context, input model.NewUser) (*model.User, error)
+	CreateUser(ctx context.Context, input model.NewUser) (string, error)
 	CreateCompany(ctx context.Context, input model.NewCompany) (*model.Company, error)
 	Login(ctx context.Context, input *model.Login) (string, error)
 	RefreshToken(ctx context.Context, input *model.RefreshTokenInput) (string, error)
@@ -373,7 +373,7 @@ input RefreshTokenInput {
 }
 
 type Mutation {
-  createUser(input: NewUser!): User
+  createUser(input: NewUser!): String!
   createCompany(input: NewCompany!): Company
   login(input: Login): String!
   refreshToken(input: RefreshTokenInput): String!
@@ -700,11 +700,14 @@ func (ec *executionContext) _Mutation_createUser(ctx context.Context, field grap
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOUser2ᚖexampleᚗcomᚋgoᚑgraphqlᚑauthᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createCompany(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2538,6 +2541,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "createUser":
 			out.Values[i] = ec._Mutation_createUser(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createCompany":
 			out.Values[i] = ec._Mutation_createCompany(ctx, field)
 		case "login":

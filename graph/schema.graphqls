@@ -49,7 +49,7 @@ input RefreshTokenInput {
 }
 
 type Mutation {
-  createUser(input: NewUser!): User
+  createUser(input: NewUser!): String!
   createCompany(input: NewCompany!): Company
   login(input: Login): String!
   refreshToken(input: RefreshTokenInput): String!

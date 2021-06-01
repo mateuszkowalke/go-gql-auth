@@ -13,6 +13,8 @@ type User struct {
 	*model.NewUser
 }
 
+type WrongEmailOrPasswordError struct{}
+
 func (u User) Create() {
 	stmt, err := database.Db.Prepare("INSERT INTO Users(Email,FirstName,LastName,Password,Role) VALUES(?,?,?,?,?)")
 	if err != nil {
@@ -87,6 +89,24 @@ func GetUserIdByEmail(email string) (int, error) {
 	return Id, nil
 }
 
+func (user *User) Authenticate() bool {
+	statement, err := database.Db.Prepare("SELECT Password FROM Users WHERE Email = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+	row := statement.QueryRow(user.Email)
+	var hashedPassword string
+	err = row.Scan(&hashedPassword)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false
+		} else {
+			log.Fatal(err)
+		}
+	}
+	return CheckPasswordHash(user.Password, hashedPassword)
+}
+
 func HashPassword(p string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(p), 14)
 	return string(bytes), err
@@ -96,4 +116,8 @@ func HashPassword(p string) (string, error) {
 func CheckPasswordHash(p, h string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(h), []byte(p))
 	return err == nil
+}
+
+func (w WrongEmailOrPasswordError) Error() string {
+	return "wrong email or password"
 }
