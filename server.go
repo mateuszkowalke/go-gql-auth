@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"example.com/go-graphql-auth/auth"
 	"example.com/go-graphql-auth/database"
 	"example.com/go-graphql-auth/graph"
 	"example.com/go-graphql-auth/graph/generated"
@@ -27,11 +28,11 @@ func main() {
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 
-	// mux.Handle("/", auth.Middleware(playground.Handler("GraphQL playground", "/query")))
-	// mux.Handle("/query", auth.Middleware(srv))
+	mux.Handle("/", auth.Middleware(playground.Handler("GraphQL playground", "/query")))
+	mux.Handle("/query", auth.Middleware(srv))
 
-	mux.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	mux.Handle("/query", srv)
+	// mux.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	// mux.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, mux))

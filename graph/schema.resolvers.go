@@ -38,7 +38,7 @@ func (r *mutationResolver) CreateCompany(ctx context.Context, input model.NewCom
 }
 
 func (r *mutationResolver) Login(ctx context.Context, input *model.Login) (string, error) {
-	var user users.User
+	user := users.User{&model.NewUser{}}
 	user.Email = input.Email
 	user.Password = input.Password
 	authenticated := user.Authenticate()

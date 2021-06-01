@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -18,7 +17,6 @@ type contextKey struct {
 var userCtxKey = &contextKey{"user"}
 
 func Middleware(next http.Handler) http.Handler {
-	fmt.Println("---------------", next, "----------------")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		header := r.Header.Get("Authorization")
 		// Allow unauthenticated users in
